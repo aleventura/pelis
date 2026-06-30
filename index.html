@@ -26,7 +26,7 @@ h1{margin:0 0 3px;font-size:19px}.sub{color:var(--mut);font-size:13px}
 .chev{color:var(--mut);font-size:13px;align-self:center;transition:transform .15s}
 .row.collapsed .chev{transform:rotate(-90deg)}
 .poster{flex:0 0 130px;width:130px;height:195px;border-radius:7px;object-fit:cover;background:#0d0f12;transition:width .15s,height .15s,flex-basis .15s}
-.row.collapsed .poster{flex:0 0 60px;width:60px;height:90px}
+.row.collapsed .poster{flex:0 0 130px;width:130px;height:195px}
 .rbody{display:flex;flex-direction:column;gap:8px;margin-top:12px}
 .row.collapsed .rbody{display:none}
 .body{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
@@ -113,12 +113,20 @@ h1{margin:0 0 3px;font-size:19px}.sub{color:var(--mut);font-size:13px}
   .bar.open{display:flex}
   .bar input,.bar select,.bar .btn{width:100%}
   .wrap{padding:14px 12px}
-  .poster{width:84px;height:126px;flex:0 0 84px}
-  .row.collapsed .poster{width:54px;height:81px;flex:0 0 54px}
+  .poster{width:104px;height:156px;flex:0 0 104px}
+  .row.collapsed .poster{width:104px;height:156px;flex:0 0 104px}
   .cols{flex-direction:column;gap:10px}
   .col{min-width:0}
   .likewrap{max-width:none}
-  .tt{font-size:16px}
+  .tt{font-size:17px}
+  .plot,.why,.love,.hate{font-size:14.5px}
+  .meta{font-size:13px}
+  .tag{font-size:11.5px}
+  .lab{font-size:11.5px}
+  .platchip{font-size:11.5px}
+  .statebtns{gap:6px}
+  .stbtn,.wbtn,.pbtn{padding:6px 9px;font-size:12.5px}
+  .stbtn .btxt{display:none}
 }
 </style></head><body>
 <header>
@@ -248,11 +256,11 @@ function buildHist(m){
 }
 function makeRow(m){
   const cur=getState(m.id,m);const showFeedback=(cur==='seen');const para=getPara(m.id,m);const cr=CRUCE[m.id]||{};
-  let pill=cur==='nueva'?'<span class="pill nueva">✨ Nueva</span>':cur==='seen'?'<span class="pill seen">Vista</span>':cur==='nope'?'<span class="pill nope">No me interesa</span>':'';
+  const prio=getPrio(m.id);
+  let pill=prio?'<span class="pill prio-'+prio+'">'+({alta:'🤩 Alta',media:'🙂 Media',baja:'😴 Baja'}[prio])+'</span>':'';
+  pill+=cur==='nueva'?'<span class="pill nueva">✨ Nueva</span>':cur==='seen'?'<span class="pill seen">Vista</span>':cur==='nope'?'<span class="pill nope">No me interesa</span>':'';
   if(para.length) pill+='<span class="pill watch">👍 '+para.map(k=>PEOPLELAB[k]).join(', ')+'</span>';
   if(m.inCine) pill+='<span class="pill cine">🎬 En cartelera</span>';
-  const prio=getPrio(m.id);
-  if(prio) pill+='<span class="pill prio-'+prio+'">'+({alta:'🤩 Alta',media:'🙂 Media',baja:'😴 Baja'}[prio])+'</span>';
   const crTag=crLabel(m.cr);
   const row=document.createElement('div');row.className='row'+(expanded.has(m.id)?'':' collapsed');
   row.innerHTML=`<div class="rhead">
@@ -272,7 +280,7 @@ function makeRow(m){
           <button class="stbtn ${cur==='nueva'?'on-nueva':''}" data-set="nueva" data-id="${m.id}">✨ Nueva</button>
           <button class="stbtn ${cur==='pend'?'on-pend':''}" data-set="pend" data-id="${m.id}">👁 Ver</button>
           <button class="stbtn ${cur==='seen'?'on-seen':''}" data-set="seen" data-id="${m.id}">✅ Vista</button>
-          <button class="stbtn ${cur==='nope'?'on-nope':''}" data-set="nope" data-id="${m.id}">🚫 No me interesa</button>
+          <button class="stbtn ${cur==='nope'?'on-nope':''}" data-set="nope" data-id="${m.id}">🚫 <span class="btxt">No me interesa</span></button>
         </div></div>
         <div class="frow"><div class="rlab">¿A quién crees que le gustaría?</div><div class="statebtns">${PEOPLE.map(([k,lab])=>'<button class="wbtn '+(para.includes(k)?'on':'')+'" data-para="'+k+'" data-id="'+m.id+'">👤 '+lab+'</button>').join('')}</div></div>
         <div class="frow"><div class="rlab">Prioridad</div><div class="statebtns">
