@@ -182,26 +182,66 @@ let st=JSON.parse(localStorage.getItem(LS)||'{}');
 const SYNC_URL='https://script.google.com/macros/s/AKfycbxWisBFcp2Ykk3smw_V2ATeAzP5R_wWV_iB0ZXFkuEU0iEOLOjRcvB0Uh5BLNwzszgQ3g/exec';
 let pushTimer=null, pending=false;
 function syncOff(){ return !SYNC_URL || SYNC_URL.indexOf('PEGA_AQUI')>=0; }
-function pullRemote(){
-  if(syncOff())return;
-  const name='__pelisCb_'+Date.now();
+/* ---- badge de estado (diagnóstico) ---- */
+function syncBadge(){
+  let b=document.getElementById('syncBadge');
+  if(!b){ b=document.createElement('div'); b.id='syncBadge';
+    b.style.cssText='position:fixed;left:8px;bottom:8px;z-index:9999;font:12px/1.3 system-ui,sans-serif;padding:6px 10px;border-radius:8px;background:#222;color:#eee;box-shadow:0 2px 8px rgba(0,0,0,.3);cursor:pointer;max-width:70vw';
+    b.title='Toca para forzar guardado en la Sheet';
+    b.onclick=function(){ pushRemote(); };
+    document.body.appendChild(b);
+  }
+  return b;
+}
+function setSync(txt,color){ const b=syncBadge(); b.textContent='Sheet: '+txt; b.style.background=color||'#222'; }
+/* ---- comparación estable (ignora orden de claves) ---- */
+function stable(o){
+  if(o===null||typeof o!=='object')return JSON.stringify(o);
+  if(Array.isArray(o))return '['+o.map(stable).join(',')+']';
+  return '{'+Object.keys(o).sort().map(function(k){return JSON.stringify(k)+':'+stable(o[k]);}).join(',')+'}';
+}
+function jsonp(cb){
+  const name='__pelisCb_'+Date.now()+'_'+Math.floor(Math.random()*1e6);
   const s=document.createElement('script');
-  const to=setTimeout(cleanup,8000);
+  const to=setTimeout(function(){cleanup();cb(null,'timeout');},8000);
   function cleanup(){ clearTimeout(to); try{delete window[name];}catch(e){} if(s.parentNode)s.remove(); }
-  window[name]=function(data){
-    try{ if(data&&typeof data==='object'){ st=data; localStorage.setItem(LS,JSON.stringify(st)); if(typeof render==='function')render(); } }catch(e){}
-    cleanup();
-  };
-  s.onerror=cleanup;
+  window[name]=function(data){ cleanup(); cb(data,null); };
+  s.onerror=function(){ cleanup(); cb(null,'error'); };
   s.src=SYNC_URL+'?callback='+name+'&t='+Date.now();
   document.body.appendChild(s);
 }
+function pullRemote(){
+  if(syncOff()){ setSync('sync apagada (sin URL)','#a33'); return; }
+  setSync('leyendo…','#555');
+  jsonp(function(data,err){
+    if(err){ setSync('no respondió al leer ('+err+')','#a33'); return; }
+    try{ if(data&&typeof data==='object'){ st=data; localStorage.setItem(LS,JSON.stringify(st)); if(typeof render==='function')render(); } }catch(e){}
+    const n=data&&typeof data==='object'?Object.keys(data).length:0;
+    setSync('leído ✓ ('+n+' pelis)','#2a6');
+  });
+}
 function pushRemote(){
   pending=false;
-  if(syncOff())return;
-  try{ fetch(SYNC_URL,{method:'POST',mode:'no-cors',body:new URLSearchParams({data:JSON.stringify(st)})}); }catch(e){}
+  if(syncOff()){ setSync('sync apagada (sin URL)','#a33'); return; }
+  const sent=JSON.parse(JSON.stringify(st));
+  setSync('enviando…','#555');
+  try{ fetch(SYNC_URL,{method:'POST',mode:'no-cors',body:new URLSearchParams({data:JSON.stringify(st)})}); }
+  catch(e){ setSync('falló el envío ('+e.message+')','#a33'); return; }
+  setSync('enviado, verificando…','#777');
+  setTimeout(function(){
+    jsonp(function(data,err){
+      if(err){ setSync('enviado, pero no pude releer ('+err+')','#a63'); return; }
+      if(data&&typeof data==='object' && stable(data)===stable(sent)){
+        const t=new Date().toTimeString().slice(0,8);
+        setSync('guardado ✓ '+t,'#2a6');
+      } else {
+        const n=data&&typeof data==='object'?Object.keys(data).length:0;
+        setSync('SIN CONFIRMAR ✗ (A1 tiene '+n+' pelis)','#c33');
+      }
+    });
+  },2200);
 }
-function schedulePush(){ pending=true; clearTimeout(pushTimer); pushTimer=setTimeout(pushRemote,2000); }
+function schedulePush(){ pending=true; setSync('cambios pendientes…','#96792b'); clearTimeout(pushTimer); pushTimer=setTimeout(pushRemote,2000); }
 window.addEventListener('beforeunload',function(){ if(pending)pushRemote(); });
 let filter='pend', genreFilter='', platFilter='', personaFilter=[], prioFilter='';
 const PEOPLE=[['ale','Ale'],['alex','Alex'],['ric','Ric'],['ariela','Ariela']];
