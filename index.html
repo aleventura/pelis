@@ -26,19 +26,21 @@ h1{margin:0 0 3px;font-size:19px}.sub{color:var(--mut);font-size:13px}
 .chev{color:var(--mut);font-size:13px;align-self:center;transition:transform .15s}
 .row.collapsed .chev{transform:rotate(-90deg)}
 .rhead{position:relative}
-.postercol{display:flex;flex-direction:column;gap:8px;align-items:stretch;flex:0 0 130px;width:130px}
-.expand-btn{background:#252a33;border:1px solid #3a4150;color:#c7ccd4;font-size:12px;font-weight:600;padding:6px 12px;border-radius:7px;cursor:pointer;line-height:1;width:100%}
+.expand-btn{position:absolute;right:0;bottom:0;background:#252a33;border:1px solid #3a4150;color:#c7ccd4;font-size:12px;font-weight:600;padding:5px 12px;border-radius:7px;cursor:pointer;line-height:1;z-index:1}
 .expand-btn::after{content:'Detalle ▾'}
-.row:not(.collapsed) .expand-btn::after{content:'Ocultar ▲'}
+.row:not(.collapsed):not(.closing) .expand-btn::after{content:'Ocultar ▲'}
 .fpersona{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.fsep{width:1px;align-self:stretch;background:#353a44;margin:2px 4px}
 .fplab{font-size:12px;color:var(--mut)}
 .fpbtn{font-size:13px;padding:6px 10px;border-radius:6px;border:1px solid #353a44;background:#20242b;color:var(--mut);cursor:pointer}
 .fpbtn.on{background:rgba(150,120,230,.18);border-color:#8a6fd0;color:#c9b3ef}
-.poster{width:100%;height:195px;border-radius:7px;object-fit:cover;background:#0d0f12}
-.row.collapsed .poster{height:195px}
+.poster{flex:0 0 130px;width:130px;height:195px;border-radius:7px;object-fit:cover;background:#0d0f12}
+.row.collapsed .poster{flex:0 0 130px;width:130px;height:195px}
 .rbody{display:flex;flex-direction:column;gap:8px;margin-top:12px}
-.row:not(.collapsed) .rbody{animation:detailOpen .28s ease}
+.row:not(.collapsed):not(.closing) .rbody{animation:detailOpen .28s ease}
+.row.closing .rbody{display:flex;animation:detailClose .28s ease forwards}
 @keyframes detailOpen{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes detailClose{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-8px)}}
 .row.collapsed .rbody{display:none}
 .body{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
 .platchip{font-size:11px;font-weight:700;padding:2px 8px;border-radius:9px;margin-left:6px;display:inline-block;vertical-align:middle}
@@ -127,13 +129,13 @@ h1{margin:0 0 3px;font-size:19px}.sub{color:var(--mut);font-size:13px}
   .bar.open{display:flex;animation:barOpen .28s ease}
   .bar input,.bar select,.bar .btn{width:100%}
   .bar .fpersona{width:100%}
+  .bar .fsep{width:100%;height:1px;align-self:stretch;margin:4px 0}
   .bar .fpersona .fplab{width:100%;margin-bottom:2px}
   .bar .fpersona .fpbtn{flex:1 1 0;min-width:0;text-align:center}
   @keyframes barOpen{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
   .wrap{padding:14px 12px}
-  .postercol{flex:0 0 104px;width:104px}
-  .poster{height:156px}
-  .row.collapsed .poster{height:156px}
+  .poster{width:104px;height:156px;flex:0 0 104px}
+  .row.collapsed .poster{width:104px;height:156px;flex:0 0 104px}
   .cols{flex-direction:column;gap:10px}
   .col{min-width:0}
   .likewrap{max-width:none}
@@ -174,10 +176,11 @@ h1{margin:0 0 3px;font-size:19px}.sub{color:var(--mut);font-size:13px}
 <input type="text" id="q" placeholder="Buscar…">
 <select id="fGenero"><option value="">Género: todos</option></select>
 <select id="fPlat"><option value="">Plataforma: todas</option></select>
-<div id="fEstado" class="fpersona"><button type="button" class="fpbtn on" data-e="pend">👁 Por ver</button><button type="button" class="fpbtn" data-e="nueva">✨ Nuevas</button><button type="button" class="fpbtn" data-e="seen">✅ Vistas</button><button type="button" class="fpbtn" data-e="all">Todas</button></div>
+<div id="fEstado" class="fpersona"><button type="button" class="fpbtn" data-e="nueva">✨ Nuevas</button><button type="button" class="fpbtn on" data-e="pend">👁 Por ver</button><button type="button" class="fpbtn" data-e="seen">✅ Vistas</button><button type="button" class="fpbtn" data-e="all">Todas</button></div>
+<span class="fsep"></span>
 <div id="fPersona" class="fpersona"><button type="button" class="fpbtn" data-p="ale">Ale</button><button type="button" class="fpbtn" data-p="alex">Alex</button><button type="button" class="fpbtn" data-p="ric">Ric</button><button type="button" class="fpbtn" data-p="ariela">Ariela</button></div>
 <div id="fPrio" class="fpersona"><button type="button" class="fpbtn" data-pr="alta">🤩 Alta</button><button type="button" class="fpbtn" data-pr="media">🙂 Media</button><button type="button" class="fpbtn" data-pr="baja">😴 Baja</button></div>
-<select id="sort"><option value="imdb">IMDb ↓</option><option value="anio">Fecha ↓</option><option value="prio">Prioridad</option></select>
+<select id="sort"><option value="imdb">IMDb ↓</option><option value="alta">Recién agregadas</option><option value="anio">Fecha ↓</option><option value="prio">Prioridad</option></select>
 <button class="btn acc" id="exp">Exportar JSON</button><button class="btn" id="imp">Vincular archivo</button><span id="linkst" style="font-size:12px;color:var(--mut);align-self:center"></span><input type="file" id="impfile" accept="application/json" style="display:none">
 </div></header>
 <div class="wrap" id="grid"></div>
@@ -343,7 +346,8 @@ const PLAT_OVERRIDE={};
 let STREAM={};
 function prepararM(){
   NUEVAS.forEach(x=>{ if(x&&x.id&&!M.some(mm=>mm.id===x.id)){ x.nuevo=true; M.push(x); } });
-  M.forEach(m=>{
+  M.forEach((m,i)=>{
+    m._idx = i;
     m.gen6 = GEN6_OVERRIDE[m.id] || deriveGen6(m.g);
     let p = (PLAT_OVERRIDE[m.id] || ['Plex']).slice();
     (STREAM[m.id]||[]).forEach(x=>{ if(!p.includes(x)) p.push(x); });
@@ -392,10 +396,7 @@ function makeRow(m){
   const crTag=crLabel(m.cr);
   const row=document.createElement('div');row.className='row'+(expanded.has(m.id)?'':' collapsed');
   row.innerHTML=`<div class="rhead">
-      <div class="postercol">
-        <img class="poster" src="${m.thumb}" alt="">
-        <button class="expand-btn" type="button"></button>
-      </div>
+      <img class="poster" src="${m.thumb}" alt="">
       <div class="rhead-main">
         <h3 class="tt">${esc(ENG[m.id]||m.t)} <span style="color:#9aa0ab;font-weight:400;font-size:14px">(${m.y})</span></h3>
         ${(watchPill||pill)?'<div class="meta">'+watchPill+pill+'</div>':''}
@@ -403,6 +404,7 @@ function makeRow(m){
         <div class="meta platline">${m.plat.map(platChip).join('')}</div>
         ${CAST[m.id]?'<div class="meta credits">'+(CAST[m.id].dir?'<span class="cred"><b>Dir.</b> '+esc(CAST[m.id].dir)+'</span>':'')+(CAST[m.id].cast?'<span class="cred"><b>Con</b> '+esc(CAST[m.id].cast)+'</span>':'')+'</div>':''}
       </div>
+      <button class="expand-btn" type="button"></button>
     </div>
     <div class="rbody">
       <div class="cols"><div class="col"><div class="plot resumen">${cr.resumen?esc(cr.resumen):'<i style="color:#9aa0ab">pendiente</i>'}</div>${cr.porque?'<div class="plot" style="margin-top:6px"><b>¿Por qué verla?</b> '+esc(cr.porque)+'</div>':''}${'<div class="why" style="margin-top:10px"><div class="lab">¿A quién le gustaría?</div>'+PEOPLE.map(p=>p[0]).map(k=>'<div style="margin-top:6px"><b style="color:#c9b3ef">'+PEOPLELAB[k]+':</b> '+whyFor(m,k)+'</div>').join('')+'</div>'}</div><div class="col">${buildHist(m)}</div></div>
@@ -424,7 +426,23 @@ function makeRow(m){
         ${showFeedback?`<div class="fb"><div class="likewrap"><button class="likebtn ${(st[m.id]||{}).liked==='like'?'on-like':''}" data-k="${m.id}" data-v="like">👍 Me gustó</button><button class="likebtn ${(st[m.id]||{}).liked==='dis'?'on-dis':''}" data-k="${m.id}" data-v="dis">👎 No me gustó</button></div><textarea data-cmt="${m.id}" placeholder="Feedback: ¿por qué te gustó o no? (lo usaré para mejorar las recomendaciones)">${esc((st[m.id]||{}).comment||'')}</textarea></div>`:''}
       </div>
     </div>`;
-  row.querySelector('.rhead').onclick=()=>{ if(expanded.has(m.id))expanded.delete(m.id); else expanded.add(m.id); row.classList.toggle('collapsed'); };
+  row.querySelector('.rhead').onclick=()=>{
+    if(expanded.has(m.id)){
+      // cerrar con animación de salida, luego colapsar
+      expanded.delete(m.id);
+      const body=row.querySelector('.rbody');
+      const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if(reduce){ row.classList.add('collapsed'); return; }
+      row.classList.add('closing');
+      const done=()=>{ body.removeEventListener('animationend',done); if(!row.classList.contains('closing'))return; row.classList.remove('closing'); row.classList.add('collapsed'); };
+      body.addEventListener('animationend',done);
+      setTimeout(done,320); // respaldo
+    } else {
+      expanded.add(m.id);
+      row.classList.remove('closing');
+      row.classList.remove('collapsed');
+    }
+  };
   row.querySelectorAll('[data-set]').forEach(b=>b.onclick=()=>setStateAnim(b.dataset.id,b.dataset.set,row));
   row.querySelectorAll('[data-para]').forEach(b=>b.onclick=()=>togglePara(b.dataset.id,b.dataset.para,m));
   row.querySelectorAll('[data-prio]').forEach(b=>b.onclick=()=>setPrio(b.dataset.id,b.dataset.prio));
@@ -440,6 +458,7 @@ function render(){
   const prioRank={alta:0,media:1,baja:2,'':3};
   const sorter=(a,b)=>{
     if(sf==='anio')return (b.y??-9999)-(a.y??-9999);
+    if(sf==='alta')return (b._idx??-1)-(a._idx??-1);
     if(sf==='prio'){const d=prioRank[getPrio(a.id)]-prioRank[getPrio(b.id)];return d!==0?d:(b.imdb??-1)-(a.imdb??-1);}
     return (b.imdb??-1)-(a.imdb??-1);
   };
