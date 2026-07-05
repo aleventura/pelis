@@ -127,12 +127,14 @@ h1{margin:0 0 3px;font-size:19px}.sub{color:var(--mut);font-size:13px}
   .filttoggle{display:inline-flex}
   .bar{display:none;flex-direction:column;align-items:stretch;margin-top:10px}
   .bar.open{display:flex;animation:barOpen .28s ease}
+  .bar.closing{display:flex;animation:barClose .28s ease forwards}
   .bar input,.bar select,.bar .btn{width:100%}
   .bar .fpersona{width:100%}
   .bar .fsep{width:100%;height:1px;align-self:stretch;margin:4px 0}
   .bar .fpersona .fplab{width:100%;margin-bottom:2px}
   .bar .fpersona .fpbtn{flex:1 1 0;min-width:0;text-align:center}
   @keyframes barOpen{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes barClose{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-8px)}}
   .wrap{padding:14px 12px}
   .poster{width:104px;height:156px;flex:0 0 104px}
   .row.collapsed .poster{width:104px;height:156px;flex:0 0 104px}
@@ -477,8 +479,19 @@ document.getElementById('fGenero').onchange=e=>{genreFilter=e.target.value;rende
 document.getElementById('fPlat').onchange=e=>{platFilter=e.target.value;render();};
 document.querySelectorAll('#fPersona .fpbtn').forEach(b=>b.onclick=()=>{const p=b.dataset.p;const i=personaFilter.indexOf(p);if(i>=0)personaFilter.splice(i,1);else personaFilter.push(p);b.classList.toggle('on');render();});
 document.querySelectorAll('#fPrio .fpbtn').forEach(b=>b.onclick=()=>{const p=b.dataset.pr;prioFilter=prioFilter===p?'':p;document.querySelectorAll('#fPrio .fpbtn').forEach(x=>x.classList.remove('on'));if(prioFilter)b.classList.add('on');render();});
-document.getElementById('filtoggle').onclick=()=>document.getElementById('bar').classList.toggle('open');
-document.addEventListener('click',e=>{const bar=document.getElementById('bar');if(!bar.classList.contains('open'))return;if(bar.contains(e.target)||document.getElementById('filtoggle').contains(e.target))return;bar.classList.remove('open');});
+function closeBar(){
+  const bar=document.getElementById('bar');
+  if(!bar.classList.contains('open'))return;
+  const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  bar.classList.remove('open');
+  if(reduce)return;
+  bar.classList.add('closing');
+  const done=()=>{ bar.removeEventListener('animationend',done); bar.classList.remove('closing'); };
+  bar.addEventListener('animationend',done);
+  setTimeout(done,320);
+}
+document.getElementById('filtoggle').onclick=()=>{const bar=document.getElementById('bar');if(bar.classList.contains('open'))closeBar();else{bar.classList.remove('closing');bar.classList.add('open');}};
+document.addEventListener('click',e=>{const bar=document.getElementById('bar');if(!bar.classList.contains('open'))return;if(bar.contains(e.target)||document.getElementById('filtoggle').contains(e.target))return;closeBar();});
 document.getElementById('fclear').onclick=()=>{
   filter='pend'; genreFilter=''; platFilter=''; personaFilter=[]; prioFilter='';
   document.querySelectorAll('#fEstado .fpbtn').forEach(b=>b.classList.toggle('on',b.dataset.e==='pend'));
