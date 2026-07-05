@@ -121,8 +121,12 @@ h1{margin:0 0 3px;font-size:19px}.sub{color:var(--mut);font-size:13px}
   .htop{margin-bottom:0}
   .filttoggle{display:inline-flex}
   .bar{display:none;flex-direction:column;align-items:stretch;margin-top:10px}
-  .bar.open{display:flex}
+  .bar.open{display:flex;animation:barOpen .28s ease}
   .bar input,.bar select,.bar .btn{width:100%}
+  .bar .fpersona{width:100%}
+  .bar .fpersona .fplab{width:100%;margin-bottom:2px}
+  .bar .fpersona .fpbtn{flex:1 1 0;min-width:0;text-align:center}
+  @keyframes barOpen{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
   .wrap{padding:14px 12px}
   .poster{width:104px;height:156px;flex:0 0 104px}
   .row.collapsed .poster{width:104px;height:156px;flex:0 0 104px}
@@ -164,12 +168,12 @@ h1{margin:0 0 3px;font-size:19px}.sub{color:var(--mut);font-size:13px}
 <div class="htop"><button class="btn filttoggle" id="filtoggle">⚙ Filtros</button><button class="btn" id="fclear">🧹 Limpiar filtros</button><span class="stats" id="stats"></span></div>
 <div class="bar" id="bar">
 <input type="text" id="q" placeholder="Buscar…">
-<select id="fEstado"><option value="pend">👁 Ver</option><option value="nueva">✨ Nuevas</option><option value="seen">✅ Vistas</option><option value="nope">🚫 No me interesa</option><option value="all">Todas</option></select>
 <select id="fGenero"><option value="">Género: todos</option></select>
 <select id="fPlat"><option value="">Plataforma: todas</option></select>
+<div id="fEstado" class="fpersona"><span class="fplab">Mostrar:</span><button type="button" class="fpbtn on" data-e="pend">👁 Ver</button><button type="button" class="fpbtn" data-e="nueva">✨ Nuevas</button><button type="button" class="fpbtn" data-e="seen">✅ Vistas</button><button type="button" class="fpbtn" data-e="nope">🚫 No me interesa</button><button type="button" class="fpbtn" data-e="all">Todas</button></div>
 <div id="fPersona" class="fpersona"><span class="fplab">Solo para:</span><button type="button" class="fpbtn" data-p="ale">Ale</button><button type="button" class="fpbtn" data-p="alex">Alex</button><button type="button" class="fpbtn" data-p="ric">Ric</button><button type="button" class="fpbtn" data-p="ariela">Ariela</button></div>
-<select id="fPrio"><option value="">Prioridad: todas</option><option value="alta">🤩 Alta</option><option value="media">🙂 Media</option><option value="baja">😴 Baja</option></select>
-<select id="sort"><option value="imdb">IMDb ↓</option><option value="anio">Por fecha</option></select>
+<div id="fPrio" class="fpersona"><span class="fplab">Prioridad:</span><button type="button" class="fpbtn" data-pr="alta">🤩 Alta</button><button type="button" class="fpbtn" data-pr="media">🙂 Media</button><button type="button" class="fpbtn" data-pr="baja">😴 Baja</button></div>
+<select id="sort"><option value="imdb">IMDb ↓</option><option value="anio">Fecha ↓</option><option value="prio">Prioridad</option></select>
 <button class="btn acc" id="exp">Exportar JSON</button><button class="btn" id="imp">Vincular archivo</button><span id="linkst" style="font-size:12px;color:var(--mut);align-self:center"></span><input type="file" id="impfile" accept="application/json" style="display:none">
 </div></header>
 <div class="wrap" id="grid"></div>
@@ -426,8 +430,12 @@ function makeRow(m){
 function render(){
   const q=document.getElementById('q').value.toLowerCase();
   const sf=document.getElementById('sort').value;
-  const dispOf=m=>{const s=stats(m.hist);return s?s.sd:-1;};
-  const sorter=(a,b)=>{if(sf==='disp')return dispOf(b)-dispOf(a);if(sf==='anio')return (a.y??9999)-(b.y??9999);return (b.imdb??-1)-(a.imdb??-1);};
+  const prioRank={alta:0,media:1,baja:2,'':3};
+  const sorter=(a,b)=>{
+    if(sf==='anio')return (b.y??-9999)-(a.y??-9999);
+    if(sf==='prio'){const d=prioRank[getPrio(a.id)]-prioRank[getPrio(b.id)];return d!==0?d:(b.imdb??-1)-(a.imdb??-1);}
+    return (b.imdb??-1)-(a.imdb??-1);
+  };
   let list=M.filter(m=>filter==='all'||getState(m.id,m)===filter)
     .filter(m=>!genreFilter||m.gen6===genreFilter)
     .filter(m=>!platFilter||m.plat.includes(platFilter))
@@ -438,20 +446,20 @@ function render(){
   list.forEach(m=>grid.appendChild(makeRow(m)));
   document.getElementById('stats').textContent=list.length+' de '+M.length;
 }
-document.getElementById('fEstado').onchange=e=>{filter=e.target.value;render();};
+document.querySelectorAll('#fEstado .fpbtn').forEach(b=>b.onclick=()=>{filter=b.dataset.e;document.querySelectorAll('#fEstado .fpbtn').forEach(x=>x.classList.remove('on'));b.classList.add('on');render();});
 document.getElementById('fGenero').onchange=e=>{genreFilter=e.target.value;render();};
 document.getElementById('fPlat').onchange=e=>{platFilter=e.target.value;render();};
 document.querySelectorAll('#fPersona .fpbtn').forEach(b=>b.onclick=()=>{const p=b.dataset.p;const i=personaFilter.indexOf(p);if(i>=0)personaFilter.splice(i,1);else personaFilter.push(p);b.classList.toggle('on');render();});
-document.getElementById('fPrio').onchange=e=>{prioFilter=e.target.value;render();};
+document.querySelectorAll('#fPrio .fpbtn').forEach(b=>b.onclick=()=>{const p=b.dataset.pr;prioFilter=prioFilter===p?'':p;document.querySelectorAll('#fPrio .fpbtn').forEach(x=>x.classList.remove('on'));if(prioFilter)b.classList.add('on');render();});
 document.getElementById('filtoggle').onclick=()=>document.getElementById('bar').classList.toggle('open');
 document.addEventListener('click',e=>{const bar=document.getElementById('bar');if(!bar.classList.contains('open'))return;if(bar.contains(e.target)||document.getElementById('filtoggle').contains(e.target))return;bar.classList.remove('open');});
 document.getElementById('fclear').onclick=()=>{
-  filter='all'; genreFilter=''; platFilter=''; personaFilter=[]; prioFilter='';
-  document.getElementById('fEstado').value='all';
+  filter='pend'; genreFilter=''; platFilter=''; personaFilter=[]; prioFilter='';
+  document.querySelectorAll('#fEstado .fpbtn').forEach(b=>b.classList.toggle('on',b.dataset.e==='pend'));
   document.getElementById('fGenero').value='';
   document.getElementById('fPlat').value='';
   document.querySelectorAll('#fPersona .fpbtn').forEach(b=>b.classList.remove('on'));
-  document.getElementById('fPrio').value='';
+  document.querySelectorAll('#fPrio .fpbtn').forEach(b=>b.classList.remove('on'));
   document.getElementById('q').value='';
   render();
 };
