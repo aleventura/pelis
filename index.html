@@ -26,16 +26,19 @@ h1{margin:0 0 3px;font-size:19px}.sub{color:var(--mut);font-size:13px}
 .chev{color:var(--mut);font-size:13px;align-self:center;transition:transform .15s}
 .row.collapsed .chev{transform:rotate(-90deg)}
 .rhead{position:relative}
-.expand-btn{position:absolute;right:0;bottom:0;background:#252a33;border:1px solid #3a4150;color:#c7ccd4;font-size:12px;font-weight:600;padding:5px 12px;border-radius:7px;cursor:pointer;line-height:1;z-index:1}
-.expand-btn::after{content:'Ver detalle ▾'}
+.postercol{display:flex;flex-direction:column;gap:8px;align-items:stretch;flex:0 0 130px;width:130px}
+.expand-btn{background:#252a33;border:1px solid #3a4150;color:#c7ccd4;font-size:12px;font-weight:600;padding:6px 12px;border-radius:7px;cursor:pointer;line-height:1;width:100%}
+.expand-btn::after{content:'Detalle ▾'}
 .row:not(.collapsed) .expand-btn::after{content:'Ocultar ▲'}
 .fpersona{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
 .fplab{font-size:12px;color:var(--mut)}
 .fpbtn{font-size:13px;padding:6px 10px;border-radius:6px;border:1px solid #353a44;background:#20242b;color:var(--mut);cursor:pointer}
 .fpbtn.on{background:rgba(150,120,230,.18);border-color:#8a6fd0;color:#c9b3ef}
-.poster{flex:0 0 130px;width:130px;height:195px;border-radius:7px;object-fit:cover;background:#0d0f12;transition:width .15s,height .15s,flex-basis .15s}
-.row.collapsed .poster{flex:0 0 130px;width:130px;height:195px}
+.poster{width:100%;height:195px;border-radius:7px;object-fit:cover;background:#0d0f12}
+.row.collapsed .poster{height:195px}
 .rbody{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.row:not(.collapsed) .rbody{animation:detailOpen .28s ease}
+@keyframes detailOpen{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
 .row.collapsed .rbody{display:none}
 .body{flex:1;min-width:0;display:flex;flex-direction:column;gap:8px}
 .platchip{font-size:11px;font-weight:700;padding:2px 8px;border-radius:9px;margin-left:6px;display:inline-block;vertical-align:middle}
@@ -128,8 +131,9 @@ h1{margin:0 0 3px;font-size:19px}.sub{color:var(--mut);font-size:13px}
   .bar .fpersona .fpbtn{flex:1 1 0;min-width:0;text-align:center}
   @keyframes barOpen{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
   .wrap{padding:14px 12px}
-  .poster{width:104px;height:156px;flex:0 0 104px}
-  .row.collapsed .poster{width:104px;height:156px;flex:0 0 104px}
+  .postercol{flex:0 0 104px;width:104px}
+  .poster{height:156px}
+  .row.collapsed .poster{height:156px}
   .cols{flex-direction:column;gap:10px}
   .col{min-width:0}
   .likewrap{max-width:none}
@@ -170,9 +174,9 @@ h1{margin:0 0 3px;font-size:19px}.sub{color:var(--mut);font-size:13px}
 <input type="text" id="q" placeholder="Buscar…">
 <select id="fGenero"><option value="">Género: todos</option></select>
 <select id="fPlat"><option value="">Plataforma: todas</option></select>
-<div id="fEstado" class="fpersona"><span class="fplab">Mostrar:</span><button type="button" class="fpbtn on" data-e="pend">👁 Ver</button><button type="button" class="fpbtn" data-e="nueva">✨ Nuevas</button><button type="button" class="fpbtn" data-e="seen">✅ Vistas</button><button type="button" class="fpbtn" data-e="nope">🚫 No me interesa</button><button type="button" class="fpbtn" data-e="all">Todas</button></div>
-<div id="fPersona" class="fpersona"><span class="fplab">Solo para:</span><button type="button" class="fpbtn" data-p="ale">Ale</button><button type="button" class="fpbtn" data-p="alex">Alex</button><button type="button" class="fpbtn" data-p="ric">Ric</button><button type="button" class="fpbtn" data-p="ariela">Ariela</button></div>
-<div id="fPrio" class="fpersona"><span class="fplab">Prioridad:</span><button type="button" class="fpbtn" data-pr="alta">🤩 Alta</button><button type="button" class="fpbtn" data-pr="media">🙂 Media</button><button type="button" class="fpbtn" data-pr="baja">😴 Baja</button></div>
+<div id="fEstado" class="fpersona"><button type="button" class="fpbtn on" data-e="pend">👁 Por ver</button><button type="button" class="fpbtn" data-e="nueva">✨ Nuevas</button><button type="button" class="fpbtn" data-e="seen">✅ Vistas</button><button type="button" class="fpbtn" data-e="all">Todas</button></div>
+<div id="fPersona" class="fpersona"><button type="button" class="fpbtn" data-p="ale">Ale</button><button type="button" class="fpbtn" data-p="alex">Alex</button><button type="button" class="fpbtn" data-p="ric">Ric</button><button type="button" class="fpbtn" data-p="ariela">Ariela</button></div>
+<div id="fPrio" class="fpersona"><button type="button" class="fpbtn" data-pr="alta">🤩 Alta</button><button type="button" class="fpbtn" data-pr="media">🙂 Media</button><button type="button" class="fpbtn" data-pr="baja">😴 Baja</button></div>
 <select id="sort"><option value="imdb">IMDb ↓</option><option value="anio">Fecha ↓</option><option value="prio">Prioridad</option></select>
 <button class="btn acc" id="exp">Exportar JSON</button><button class="btn" id="imp">Vincular archivo</button><span id="linkst" style="font-size:12px;color:var(--mut);align-self:center"></span><input type="file" id="impfile" accept="application/json" style="display:none">
 </div></header>
@@ -356,7 +360,8 @@ const expanded=new Set();
 function crLabel(cr){const T={'A':'Todo público','AA':'Niños','TV-G':'Todo público','B':'+14','B15':'+15','B-15':'+15','C':'+18','18':'+18','R':'+17 (R)','PG':'Guía parental','TV-PG':'Guía parental','PG-13':'+13'};return cr?(T[cr]||cr):'';}
 const PLATCOL={'Plex':'#e5a00d','Netflix':'#e50914','Disney+':'#1f6fff','Prime Video':'#00a8e1','Apple TV+':'#444','HBO Max':'#7b2ff7','Cine':'#4cc2c2'};
 const PLATICON={'Cine':'🎬'};
-function platChip(p){const c=PLATCOL[p]||'#5b9bd5';const txt=(p==='Plex')?'#1a1a1a':'#fff';const ic=PLATICON[p]?PLATICON[p]+' ':'';return '<span class="platchip" style="background:'+c+';color:'+txt+'">'+ic+esc(p)+'</span>';}
+const PLATLBL={'Prime Video':'Prime','HBO Max':'HBO'};
+function platChip(p){const c=PLATCOL[p]||'#5b9bd5';const txt=(p==='Plex')?'#1a1a1a':'#fff';const ic=PLATICON[p]?PLATICON[p]+' ':'';return '<span class="platchip" style="background:'+c+';color:'+txt+'">'+ic+esc(PLATLBL[p]||p)+'</span>';}
 function fmtResumen(t){return esc(t||'').replace(/\s*A favor:/,'<br><span class="favor">A favor:</span>').replace(/\s*En contra:/,'<br><span class="contra">En contra:</span>');}
 
 let ENG={};
@@ -387,15 +392,17 @@ function makeRow(m){
   const crTag=crLabel(m.cr);
   const row=document.createElement('div');row.className='row'+(expanded.has(m.id)?'':' collapsed');
   row.innerHTML=`<div class="rhead">
-      <img class="poster" src="${m.thumb}" alt="">
+      <div class="postercol">
+        <img class="poster" src="${m.thumb}" alt="">
+        <button class="expand-btn" type="button"></button>
+      </div>
       <div class="rhead-main">
-        <h3 class="tt">${esc(ENG[m.id]||m.t)} <span style="color:#9aa0ab;font-weight:400;font-size:14px">(${m.y})</span>${watchPill}${pill}</h3>
-        <div class="meta">${[m.dur?m.dur+' min':null].filter(Boolean).map(x=>'<span class="tag">'+x+'</span>').join('')}${crTag?'<span class="tag" title="'+esc(m.cr)+'">'+crTag+'</span>':''}<span class="mdivider"></span>${(m.g||[]).map(g=>'<span class="tag">'+esc(g)+'</span>').join('')}</div>
-        <div class="meta"><span class="imdbbadge">IMDb <b>${m.imdb??'—'}</b></span></div>
+        <h3 class="tt">${esc(ENG[m.id]||m.t)} <span style="color:#9aa0ab;font-weight:400;font-size:14px">(${m.y})</span></h3>
+        ${(watchPill||pill)?'<div class="meta">'+watchPill+pill+'</div>':''}
+        <div class="meta"><span class="imdbbadge">IMDb <b>${m.imdb??'—'}</b></span>${[m.dur?m.dur+' min':null].filter(Boolean).map(x=>'<span class="tag">'+x+'</span>').join('')}${crTag?'<span class="tag" title="'+esc(m.cr)+'">'+crTag+'</span>':''}<span class="mdivider"></span>${(m.g||[]).map(g=>'<span class="tag">'+esc(g)+'</span>').join('')}</div>
         <div class="meta platline">${m.plat.map(platChip).join('')}</div>
         ${CAST[m.id]?'<div class="meta credits">'+(CAST[m.id].dir?'<span class="cred"><b>Dir.</b> '+esc(CAST[m.id].dir)+'</span>':'')+(CAST[m.id].cast?'<span class="cred"><b>Con</b> '+esc(CAST[m.id].cast)+'</span>':'')+'</div>':''}
       </div>
-      <button class="expand-btn" type="button"></button>
     </div>
     <div class="rbody">
       <div class="cols"><div class="col"><div class="plot resumen">${cr.resumen?esc(cr.resumen):'<i style="color:#9aa0ab">pendiente</i>'}</div>${cr.porque?'<div class="plot" style="margin-top:6px"><b>¿Por qué verla?</b> '+esc(cr.porque)+'</div>':''}${'<div class="why" style="margin-top:10px"><div class="lab">¿A quién le gustaría?</div>'+PEOPLE.map(p=>p[0]).map(k=>'<div style="margin-top:6px"><b style="color:#c9b3ef">'+PEOPLELAB[k]+':</b> '+whyFor(m,k)+'</div>').join('')+'</div>'}</div><div class="col">${buildHist(m)}</div></div>
