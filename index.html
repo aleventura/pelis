@@ -46,6 +46,7 @@ h1{margin:0 0 3px;font-size:19px}.sub{color:var(--mut);font-size:13px}
 .platchip{font-size:11px;font-weight:700;padding:2px 8px;border-radius:9px;margin-left:6px;display:inline-block;vertical-align:middle}
 .tt{font-size:18px;font-weight:700;margin:0}
 .pill{font-size:11px;padding:2px 9px;border-radius:10px;font-weight:600;vertical-align:middle;margin-left:6px}
+.meta .pill:first-child{margin-left:0}
 .pill.seen{background:rgba(62,196,109,.15);color:var(--green)}
 .pill.unsure{background:rgba(217,164,65,.15);color:var(--amber)}
 .pill.watch{background:rgba(169,136,224,.16);color:var(--purple)}
@@ -129,11 +130,11 @@ h1{margin:0 0 3px;font-size:19px}.sub{color:var(--mut);font-size:13px}
   .bar.open{display:flex;animation:barOpen .28s ease}
   .bar.closing{display:flex;animation:barClose .28s ease forwards}
   .bar input,.bar select,.bar .btn{width:100%}
-  .bar .fpersona{width:100%;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .bar .fpersona{width:100%;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;gap:5px}
   .bar .fpersona::-webkit-scrollbar{display:none}
   .bar .fsep{width:100%;height:1px;align-self:stretch;margin:4px 0}
   .bar .fpersona .fplab{width:auto;margin-bottom:0}
-  .bar .fpersona .fpbtn{flex:0 0 auto;white-space:nowrap;text-align:center;padding:6px 9px;font-size:12.5px}
+  .bar .fpersona .fpbtn{flex:1 1 auto;white-space:nowrap;text-align:center;padding:6px 8px;font-size:11px}
   @keyframes barOpen{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
   @keyframes barClose{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-8px)}}
   .wrap{padding:14px 12px}
@@ -206,7 +207,7 @@ function syncBadge(){
   }
   return b;
 }
-function setSync(txt,color){ const b=syncBadge(); b.textContent='Sheet: '+txt; b.style.background=color||'#222'; }
+function setSync(txt,color){ const b=syncBadge(); b.textContent='Sheet: '+txt; b.style.background=color||'#222'; b.style.display=({'#a33':1,'#c33':1,'#a63':1}[color])?'block':'none'; }
 /* ---- comparación estable (ignora orden de claves) ---- */
 function stable(o){
   if(o===null||typeof o!=='object')return JSON.stringify(o);
@@ -330,7 +331,7 @@ const grid=document.getElementById('grid');
 const GEN6=[['','Todos'],['dt','Drama / Thriller'],['aa','Acción / Aventura / Crimen'],['cm','Comedia / Musical'],['an','Anime'],['ho','Horror'],['fc','Fantasía / Ciencia ficción'],['sc','Sin clasificar']];
 const GEN6LAB=Object.fromEntries(GEN6);
 const GABREV={dt:'Drama',aa:'Acción',cm:'Comedia',an:'Anime',ho:'Horror',fc:'Fantasía',sc:'Sin clasif.'};
-const PABREV={'Apple TV+':'Apple','Disney+':'Disney+','HBO Max':'HBO','Prime Video':'Prime'};
+const PABREV={'Apple TV+':'Apple','Disney+':'Disney','HBO Max':'HBO','Prime Video':'Prime'};
 // El "anime" no se puede deducir del tag TMDB (Animation cubre Shrek y Akira por igual): asígnalo aquí por id.
 const GEN6_OVERRIDE={"tt0094625":"an","tt9426210":"an","tt10540510":"an","tt5311514":"an","tt25434854":"an"};
 function deriveGen6(g){g=g||[];
