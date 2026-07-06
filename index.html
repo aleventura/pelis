@@ -46,7 +46,7 @@ h1{margin:0 0 3px;font-size:19px}.sub{color:var(--mut);font-size:13px}
 .platchip{font-size:11px;font-weight:700;padding:2px 8px;border-radius:9px;margin-left:6px;display:inline-block;vertical-align:middle}
 .tt{font-size:18px;font-weight:700;margin:0}
 .pill{font-size:11px;padding:2px 9px;border-radius:10px;font-weight:600;vertical-align:middle;margin-left:6px}
-.meta .pill:first-child{margin-left:0}
+.meta .pill,.meta .platchip{margin-left:0}
 .pill.seen{background:rgba(62,196,109,.15);color:var(--green)}
 .pill.unsure{background:rgba(217,164,65,.15);color:var(--amber)}
 .pill.watch{background:rgba(169,136,224,.16);color:var(--purple)}
@@ -134,7 +134,7 @@ h1{margin:0 0 3px;font-size:19px}.sub{color:var(--mut);font-size:13px}
   .bar .fpersona::-webkit-scrollbar{display:none}
   .bar .fsep{width:100%;height:1px;align-self:stretch;margin:4px 0}
   .bar .fpersona .fplab{width:auto;margin-bottom:0}
-  .bar .fpersona .fpbtn{flex:1 1 auto;white-space:nowrap;text-align:center;padding:6px 8px;font-size:11px}
+  .bar .fpersona .fpbtn{flex:1 1 auto;white-space:nowrap;text-align:center;padding:6px 8px;font-size:12.5px}
   @keyframes barOpen{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
   @keyframes barClose{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-8px)}}
   .wrap{padding:14px 12px}
@@ -330,7 +330,7 @@ const grid=document.getElementById('grid');
 // ===== 6 categorías de género (clasificación mía, editable por id en GEN6_OVERRIDE) =====
 const GEN6=[['','Todos'],['dt','Drama / Thriller'],['aa','Acción / Aventura / Crimen'],['cm','Comedia / Musical'],['an','Anime'],['ho','Horror'],['fc','Fantasía / Ciencia ficción'],['sc','Sin clasificar']];
 const GEN6LAB=Object.fromEntries(GEN6);
-const GABREV={dt:'Drama',aa:'Acción',cm:'Comedia',an:'Anime',ho:'Horror',fc:'Fantasía',sc:'Sin clasif.'};
+const GGROUPS=[['aa,cm','Acción/Com'],['an','Anime'],['dt','Drama'],['fc','Fantasía'],['ho','Horror'],['sc','Sin clasif.']];
 const PABREV={'Apple TV+':'Apple','Disney+':'Disney','HBO Max':'HBO','Prime Video':'Prime'};
 // El "anime" no se puede deducir del tag TMDB (Animation cubre Shrek y Akira por igual): asígnalo aquí por id.
 const GEN6_OVERRIDE={"tt0094625":"an","tt9426210":"an","tt10540510":"an","tt5311514":"an","tt25434854":"an"};
@@ -360,7 +360,7 @@ function prepararM(){
     m.plat = p;
     m.pre = PRE[m.id] || [];
   });
-  document.getElementById('fGenero').innerHTML=GEN6.filter(([k])=>k&&M.some(m=>m.gen6===k)).sort((a,b)=>a[1].localeCompare(b[1],'es')).map(([k,lab])=>'<button type="button" class="fpbtn'+(genreFilter.includes(k)?' on':'')+'" data-g="'+k+'">'+esc(GABREV[k]||lab)+'</button>').join('');
+  document.getElementById('fGenero').innerHTML=GGROUPS.filter(([g])=>g.split(',').some(k=>M.some(m=>m.gen6===k))).map(([g,lab])=>'<button type="button" class="fpbtn'+(g.split(',').every(k=>genreFilter.includes(k))?' on':'')+'" data-g="'+g+'">'+esc(lab)+'</button>').join('');
   const platsPresent=[...new Set(M.flatMap(m=>m.plat))].sort((a,b)=>a.localeCompare(b,'es'));
   document.getElementById('fPlat').innerHTML=platsPresent.map(p=>'<button type="button" class="fpbtn'+(platFilter.includes(p)?' on':'')+'" data-pl="'+esc(p)+'">'+esc(PABREV[p]||p)+'</button>').join('');
 }
@@ -478,7 +478,7 @@ function render(){
   document.getElementById('stats').textContent=list.length+' de '+M.length;
 }
 document.querySelectorAll('#fEstado .fpbtn').forEach(b=>b.onclick=()=>{filter=b.dataset.e;document.querySelectorAll('#fEstado .fpbtn').forEach(x=>x.classList.remove('on'));b.classList.add('on');render();});
-document.getElementById('fGenero').addEventListener('click',e=>{const b=e.target.closest('.fpbtn');if(!b)return;const g=b.dataset.g;const i=genreFilter.indexOf(g);if(i>=0)genreFilter.splice(i,1);else genreFilter.push(g);b.classList.toggle('on');render();});
+document.getElementById('fGenero').addEventListener('click',e=>{const b=e.target.closest('.fpbtn');if(!b)return;const keys=b.dataset.g.split(',');const on=keys.every(k=>genreFilter.includes(k));if(on)genreFilter=genreFilter.filter(k=>!keys.includes(k));else keys.forEach(k=>{if(!genreFilter.includes(k))genreFilter.push(k);});b.classList.toggle('on',!on);render();});
 document.getElementById('fPlat').addEventListener('click',e=>{const b=e.target.closest('.fpbtn');if(!b)return;const p=b.dataset.pl;const i=platFilter.indexOf(p);if(i>=0)platFilter.splice(i,1);else platFilter.push(p);b.classList.toggle('on');render();});
 document.querySelectorAll('#fPersona .fpbtn').forEach(b=>b.onclick=()=>{
   const p=b.dataset.p, turningOn=personaFilter.indexOf(p)<0;
