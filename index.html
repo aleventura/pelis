@@ -53,7 +53,7 @@ h1{margin:0 0 3px;font-size:19px}.sub{color:var(--mut);font-size:13px}
 .pill.cine{background:rgba(76,194,194,.16);color:var(--teal)}
 .pill.nope{background:rgba(227,93,93,.15);color:var(--red)}
 .pill.nueva{background:rgba(214,120,200,.16);color:#e29bd8}
-.meta{font-size:12px;color:var(--mut);display:flex;flex-wrap:wrap;gap:5px 11px;align-items:center}
+.meta{font-size:12px;color:var(--mut);display:flex;flex-wrap:wrap;gap:5px 8px;align-items:center}
 .imdbbadge{background:rgba(229,160,13,.16);color:var(--acc);font-weight:700;padding:2px 9px;border-radius:9px}
 .imdbbadge b{color:var(--acc);font-size:13px}
 .mdivider{width:1px;align-self:stretch;background:#3a4049;margin:2px 4px}
@@ -184,7 +184,7 @@ h1{margin:0 0 3px;font-size:19px}.sub{color:var(--mut);font-size:13px}
 <span class="fsep"></span>
 <div id="fPersona" class="fpersona"><button type="button" class="fpbtn" data-p="ale">Ale</button><button type="button" class="fpbtn" data-p="alex">Alex</button><button type="button" class="fpbtn" data-p="ric">Ric</button><button type="button" class="fpbtn" data-p="ariela">Ariela</button><button type="button" class="fpbtn" data-p="__none">🚫 Sin</button></div>
 <div id="fPrio" class="fpersona"><button type="button" class="fpbtn" data-pr="alta">🤩 Alta</button><button type="button" class="fpbtn" data-pr="media">🙂 Media</button><button type="button" class="fpbtn" data-pr="baja">😴 Baja</button></div>
-<div id="sort" class="fpersona"><button type="button" class="fpbtn on" data-s="imdb">IMDb ↓</button><button type="button" class="fpbtn" data-s="alta">Recién</button><button type="button" class="fpbtn" data-s="anio">Fecha ↓</button><button type="button" class="fpbtn" data-s="prio">Prioridad</button></div>
+<div id="sort" class="fpersona"><button type="button" class="fpbtn on" data-s="imdb">IMDb ↓</button><button type="button" class="fpbtn" data-s="alta">Recién ↓</button><button type="button" class="fpbtn" data-s="anio">Fecha ↓</button><button type="button" class="fpbtn" data-s="prio">Prioridad ↓</button></div>
 </div></header>
 <div class="wrap" id="grid"></div>
 
@@ -338,7 +338,7 @@ function deriveGen6(g){g=g||[];
   if(g.includes('Horror'))return 'ho';
   if(g.includes('Science Fiction')||g.includes('Fantasy'))return 'fc';
   if(g.includes('Action')||g.includes('Adventure')||g.includes('Crime')||g.includes('War'))return 'aa';
-  if(g.includes('Comedy')||g.includes('Music'))return 'cm';
+  if(g.includes('Comedy'))return 'cm';
   if(g.includes('Drama')||g.includes('Thriller')||g.includes('Mystery')||g.includes('History')||g.includes('Romance')||g.includes('Documentary')||g.includes('Biography'))return 'dt';
   return 'sc';}
 // ===== Plataformas: Cine cuenta como una plataforma más, igual que Plex. =====
@@ -359,6 +359,7 @@ function prepararM(){
     if(m.inCine && !p.includes('Cine')) p.push('Cine');
     m.plat = p;
     m.pre = PRE[m.id] || [];
+    if(m.nuevo===undefined) m.nuevo = !(m.hist && Object.keys(m.hist).length>0);
   });
   document.getElementById('fGenero').innerHTML=GGROUPS.filter(([g])=>g.split(',').some(k=>M.some(m=>m.gen6===k))).map(([g,lab])=>'<button type="button" class="fpbtn'+(g.split(',').every(k=>genreFilter.includes(k))?' on':'')+'" data-g="'+g+'">'+esc(lab)+'</button>').join('');
   const platsPresent=[...new Set(M.flatMap(m=>m.plat))].sort((a,b)=>a.localeCompare(b,'es'));
@@ -366,7 +367,7 @@ function prepararM(){
 }
 
 const expanded=new Set();
-function crLabel(cr){const T={'A':'Todo público','AA':'Niños','TV-G':'Todo público','B':'+14','B15':'+15','B-15':'+15','C':'+18','18':'+18','R':'+17 (R)','PG':'Guía parental','TV-PG':'Guía parental','PG-13':'+13'};return cr?(T[cr]||cr):'';}
+function crLabel(cr){const T={'A':'Todo','AA':'Niños','TV-G':'Todo','B':'+14','B15':'+15','B-15':'+15','C':'+18','18':'+18','R':'+17 (R)','PG':'Guía parental','TV-PG':'Guía parental','PG-13':'+13'};return cr?(T[cr]||cr):'';}
 const PLATCOL={'Plex':'#e5a00d','Netflix':'#e50914','Disney+':'#1f6fff','Prime Video':'#00a8e1','Apple TV+':'#444','HBO Max':'#7b2ff7','Cine':'#4cc2c2'};
 const PLATICON={'Cine':'🎬'};
 const PLATLBL={'Prime Video':'Prime','HBO Max':'HBO'};
@@ -405,7 +406,8 @@ function makeRow(m){
       <div class="rhead-main">
         <h3 class="tt">${esc(ENG[m.id]||m.t)} <span style="color:#9aa0ab;font-weight:400;font-size:14px">(${m.y})</span></h3>
         ${(watchPill||pill)?'<div class="meta">'+watchPill+pill+'</div>':''}
-        <div class="meta"><span class="imdbbadge">IMDb <b>${m.imdb??'—'}</b></span>${[m.dur?m.dur+' min':null].filter(Boolean).map(x=>'<span class="tag">'+x+'</span>').join('')}${crTag?'<span class="tag" title="'+esc(m.cr)+'">'+crTag+'</span>':''}<span class="mdivider"></span>${(m.g||[]).map(g=>'<span class="tag">'+esc(g)+'</span>').join('')}</div>
+        <div class="meta"><span class="imdbbadge">IMDb <b>${m.imdb??'—'}</b></span>${[m.dur?m.dur+' min':null].filter(Boolean).map(x=>'<span class="tag">'+x+'</span>').join('')}${crTag?'<span class="tag" title="'+esc(m.cr)+'">'+crTag+'</span>':''}</div>
+        ${(m.g||[]).length?'<div class="meta">'+(m.g||[]).map(g=>'<span class="tag">'+esc(g)+'</span>').join('')+'</div>':''}
         <div class="meta platline">${m.plat.map(platChip).join('')}</div>
         ${CAST[m.id]?'<div class="meta credits">'+(CAST[m.id].dir?'<span class="cred"><b>Dir.</b> '+esc(CAST[m.id].dir)+'</span>':'')+(CAST[m.id].cast?'<span class="cred"><b>Con</b> '+esc(CAST[m.id].cast)+'</span>':'')+'</div>':''}
       </div>
