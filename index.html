@@ -184,7 +184,7 @@ h1{margin:0 0 3px;font-size:19px}.sub{color:var(--mut);font-size:13px}
 <span class="fsep"></span>
 <div id="fPersona" class="fpersona"><button type="button" class="fpbtn" data-p="ale">Ale</button><button type="button" class="fpbtn" data-p="alex">Alex</button><button type="button" class="fpbtn" data-p="ric">Ric</button><button type="button" class="fpbtn" data-p="ariela">Ariela</button><button type="button" class="fpbtn" data-p="__none">🚫 Sin</button></div>
 <div id="fPrio" class="fpersona"><button type="button" class="fpbtn" data-pr="alta">🤩 Alta</button><button type="button" class="fpbtn" data-pr="media">🙂 Media</button><button type="button" class="fpbtn" data-pr="baja">😴 Baja</button></div>
-<div id="sort" class="fpersona"><button type="button" class="fpbtn on" data-s="imdb">IMDb ↓</button><button type="button" class="fpbtn" data-s="alta">Recién ↓</button><button type="button" class="fpbtn" data-s="anio">Fecha ↓</button><button type="button" class="fpbtn" data-s="prio">Prioridad ↓</button></div>
+<div id="sort" class="fpersona"><button type="button" class="fpbtn on" data-s="imdb">IMDb ↓</button><button type="button" class="fpbtn" data-s="alta">Agregado ↓</button><button type="button" class="fpbtn" data-s="anio">Fecha ↓</button><button type="button" class="fpbtn" data-s="prio">Prioridad ↓</button></div>
 </div></header>
 <div class="wrap" id="grid"></div>
 
@@ -332,6 +332,7 @@ const GEN6=[['','Todos'],['dt','Drama / Thriller'],['aa','Acción / Aventura / C
 const GEN6LAB=Object.fromEntries(GEN6);
 const GGROUPS=[['aa,cm','Acción/Com'],['an','Anime'],['dt','Drama'],['fc','Fantasía'],['ho','Horror'],['sc','Sin clasif.']];
 const PABREV={'Apple TV+':'Apple','Disney+':'Disney','HBO Max':'HBO','Prime Video':'Prime'};
+const PLATNORM={'Amazon Prime Video':'Prime Video'};
 // El "anime" no se puede deducir del tag TMDB (Animation cubre Shrek y Akira por igual): asígnalo aquí por id.
 const GEN6_OVERRIDE={"tt0094625":"an","tt9426210":"an","tt10540510":"an","tt5311514":"an","tt25434854":"an"};
 function deriveGen6(g){g=g||[];
@@ -355,7 +356,7 @@ function prepararM(){
     m._idx = i;
     m.gen6 = GEN6_OVERRIDE[m.id] || deriveGen6(m.g);
     let p = (PLAT_OVERRIDE[m.id] || ['Plex']).slice();
-    (STREAM[m.id]||[]).forEach(x=>{ if(!p.includes(x)) p.push(x); });
+    (STREAM[m.id]||[]).forEach(x=>{ x=PLATNORM[x]||x; if(!p.includes(x)) p.push(x); });
     if(m.inCine && !p.includes('Cine')) p.push('Cine');
     m.plat = p;
     m.pre = PRE[m.id] || [];
