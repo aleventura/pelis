@@ -152,7 +152,7 @@ h1{margin:0 0 3px;font-size:19px}.sub{color:var(--mut);font-size:13px}
   .lab{font-size:11.5px}
   .platchip{font-size:11.5px}
   .statebtns{gap:6px}
-  .stbtn,.wbtn,.pbtn{flex:1 1 auto;min-width:0;text-align:center;font-size:17px;padding:10px 6px}
+  .stbtn,.wbtn,.pbtn{flex:1 1 auto;min-width:0;text-align:center;font-size:12.5px;padding:6px 8px}
   .stbtn .btxt{display:none}
 }
 .platline{margin-top:2px}
@@ -166,10 +166,9 @@ h1{margin:0 0 3px;font-size:19px}.sub{color:var(--mut);font-size:13px}
 .paraline .pill{font-size:13px}
 .imdbbadge,.imdbbadge b{font-size:13px}
 .lab{font-size:11px}
-.stbtn,.wbtn,.pbtn{font-size:14px}
+.stbtn,.wbtn,.pbtn{font-size:13px}
 @media(max-width:600px){
   .tt{font-size:18px}
-  .stbtn,.wbtn,.pbtn{font-size:15px}
 }
 .credits{gap:12px;flex-wrap:wrap}
 .cred{font-size:12px;color:var(--mut)}
@@ -419,14 +418,14 @@ function makeRow(m){
       <div class="cols"><div class="col"><div class="plot resumen">${cr.resumen?esc(cr.resumen):'<i style="color:#9aa0ab">pendiente</i>'}</div>${cr.porque?'<div class="plot" style="margin-top:6px"><b>¿Por qué verla?</b> '+esc(cr.porque)+'</div>':''}${'<div class="why" style="margin-top:10px"><div class="lab">¿A quién le gustaría?</div>'+PEOPLE.map(p=>p[0]).map(k=>'<div style="margin-top:6px"><b style="color:#c9b3ef">'+PEOPLELAB[k]+':</b> '+whyFor(m,k)+'</div>').join('')+'</div>'}</div><div class="col">${buildHist(m)}</div></div>
       <div class="foot">
         <div class="frow2">
-        <div class="frow"><div class="rlab">Estado</div><div class="statebtns">
+        <div class="frow"><div class="statebtns">
           <button class="stbtn ${cur==='nueva'?'on-nueva':''}" data-set="nueva" data-id="${m.id}">✨ Nueva</button>
           <button class="stbtn ${cur==='pend'?'on-pend':''}" data-set="pend" data-id="${m.id}">👁 Ver</button>
           <button class="stbtn ${cur==='seen'?'on-seen':''}" data-set="seen" data-id="${m.id}">✅ Vista</button>
           <button class="stbtn ${cur==='nope'?'on-nope':''}" data-set="nope" data-id="${m.id}">🚫 <span class="btxt">No me interesa</span></button>
         </div></div>
-        <div class="frow"><div class="rlab">¿A quién crees que le gustaría?</div><div class="statebtns">${PEOPLE.map(([k,lab])=>'<button class="wbtn '+(para.includes(k)?'on':'')+'" data-para="'+k+'" data-id="'+m.id+'">👤 '+lab+'</button>').join('')}</div></div>
-        <div class="frow"><div class="rlab">Prioridad</div><div class="statebtns">
+        <div class="frow"><div class="statebtns">${PEOPLE.map(([k,lab])=>'<button class="wbtn '+(para.includes(k)?'on':'')+'" data-para="'+k+'" data-id="'+m.id+'">👤 '+lab+'</button>').join('')}</div></div>
+        <div class="frow"><div class="statebtns">
           <button class="pbtn ${prio==='alta'?'on-alta':''}" data-prio="alta" data-id="${m.id}">🤩 Alta</button>
           <button class="pbtn ${prio==='media'?'on-media':''}" data-prio="media" data-id="${m.id}">🙂 Media</button>
           <button class="pbtn ${prio==='baja'?'on-baja':''}" data-prio="baja" data-id="${m.id}">😴 Baja</button>
